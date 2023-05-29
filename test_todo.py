@@ -130,3 +130,10 @@ def test_network(page):
     page.route("**/register", lambda route: route.continue_(post_data='{"email": "user","password": "secret"}'))
     page.goto('https://reqres.in/')
     page.get_by_text(' Register - successful ').click()
+
+
+def test_mock_tags(page):
+    page.route("**/api/tags", lambda route: route.fulfill(path="data.json"))
+    page.goto('https://demo.realworld.io/')
+
+
