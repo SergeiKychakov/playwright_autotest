@@ -1,4 +1,4 @@
-from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Playwright, Page, Route, sync_playwright, expect
 from datetime import datetime
 import os
 
@@ -6,7 +6,7 @@ current_date = datetime.now(tz=None)
 cur_time = current_date.strftime('%m-%d-%Y_%H-%M-%S')
 
 
-def screenshot(page):
+def screenshot(page: Page):
     page.screenshot(path=f"Screenshots/screenshot_{cur_time}.png")
 
 def test_add_todo(playwright: Playwright) -> None:
@@ -22,7 +22,7 @@ def test_add_todo(playwright: Playwright) -> None:
     browser.close()
 
 
-def test_checkbox(page):
+def test_checkbox(page: Page):
     page.goto('https://checks-radios.antonzimaiev.repl.co/')
     page.locator("text=Default checkbox").check()
     page.locator("text=Checked checkbox").check()
@@ -32,7 +32,7 @@ def test_checkbox(page):
     screenshot(page)
 
 
-def test_select(page):
+def test_select(page: Page):
     page.goto('https://select.antonzimaiev.repl.co/')
     page.select_option('#floatingSelect', value="3")
     page.select_option('#floatingSelect', index=1)
@@ -40,34 +40,33 @@ def test_select(page):
     screenshot(page)
 
 
-def test_select_multiple(page):
+def test_select_multiple(page: Page):
     page.goto('https://select.antonzimaiev.repl.co/')
     page.select_option('#skills', value=["playwright", "python"])
     screenshot(page)
 
 
-def test_select_multiple_file(page):
+def test_select_multiple_file(page: Page):
     page.goto('https://upload.antonzimaiev.repl.co/')
     page.set_input_files("#formFile", "test.txt")
     screenshot(page)
     page.locator("#file-submit").click()
 
 
-
-def test_drag_and_drop(page):
+def test_drag_and_drop(page: Page):
     page.goto('https://draganddrop.antonzimaiev.repl.co/')
     page.drag_and_drop("#drag", "#drop")
     screenshot(page)
 
 
-def test_dialogs(page):
+def test_dialogs(page: Page):
     page.goto("https://dialog.antonzimaiev.repl.co/")
     page.on("dialog", lambda dialog: dialog.accept())
     page.get_by_text("Диалог Confirmation").click()
     screenshot(page)
 
 
-def test_download(page):
+def test_download(page: Page):
 
     page.goto("https://demoqa.com/upload-download")
 
@@ -80,19 +79,19 @@ def test_download(page):
     download.save_as(os.path.join(destination_folder_path, file_name))
 
 
-def test_inner_text(page):
+def test_inner_text(page: Page):
     page.goto('https://table.antonzimaiev.repl.co/')
     row = page.locator("tr")
     print(row.all_inner_texts())
 
 
-def test_text_content(page):
+def test_text_content(page: Page):
     page.goto('https://table.antonzimaiev.repl.co/')
     row = page.locator("tr")
     print(row.all_text_contents())
 
 
-def test_new_tab(page):
+def test_new_tab(page: Page):
     page.goto("https://tabs.antonzimaiev.repl.co/")
     with page.context.expect_page() as tab:
         page.get_by_text("Переход к Dashboard").click()
@@ -105,7 +104,8 @@ def test_new_tab(page):
     screenshot(page)
     assert sign_out.is_visible()
 
-def test_todo(page):
+
+def test_todo(page: Page):
     page.goto('https://demo.playwright.dev/todomvc/#/')
     expect(page).to_have_url("https://demo.playwright.dev/todomvc/#/")
     input_field = page.get_by_placeholder('What needs to be done?')
@@ -120,25 +120,25 @@ def test_todo(page):
     expect(todo_item.nth(0)).to_have_class('completed')
 
 
-def test_listen_network(page):
+def test_listen_network(page: Page):
     page.on("request", lambda request: print(">>", request.method, request.url))
     page.on("response", lambda response: print("<<", response.status, response.url))
     page.goto('https://osinit.ru/')
 
 
-def test_network(page):
+def test_network(page: Page):
     page.route("**/register", lambda route: route.continue_(post_data='{"email": "user","password": "secret"}'))
     page.goto('https://reqres.in/')
     page.get_by_text(' Register - successful ').click()
 
 
-def test_mock_tags(page):
+def test_mock_tags(page: Page):
     page.route("**/api/tags", lambda route: route.fulfill(path="data.json"))
     page.goto('https://demo.realworld.io/')
 
 
-def test_intercepted(page):
-    def handle_route(route):
+def test_intercepted(page: Page):
+    def handle_route(route: Route):
         response = route.fetch()
         json = response.json()
         json["tags"] = ["open", "solutions"]
