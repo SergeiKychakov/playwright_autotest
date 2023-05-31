@@ -9,6 +9,7 @@ cur_time = current_date.strftime('%m-%d-%Y_%H-%M-%S')
 def screenshot(page: Page):
     page.screenshot(path=f"Screenshots/screenshot_{cur_time}.png")
 
+
 def test_add_todo(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
